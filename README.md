@@ -52,6 +52,7 @@ This repository contains a service for managing bundles in cloud and edge enviro
 To run the main service:
 ```sh
 python main.py
+```
 
 ## Picar-x code usage
 1. Copy the picar-x-code in the raspberry pi-4 on the picar-x car
@@ -59,4 +60,4 @@ python main.py
   ```sh
   cd picar-x-code
   ```
-3. Run ```sh python main.py
+3. Run ```sh python main.py```

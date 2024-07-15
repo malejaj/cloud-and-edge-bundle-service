@@ -1,6 +1,6 @@
 def vitesse_decision(dist, vitesse):
-    if dist < 20:
+    if dist < 80:
         return 0
-    elif dist < 40:
+    elif dist < 100:
         return 1
     return 2

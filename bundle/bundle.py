@@ -20,21 +20,21 @@ async def read_root():
 @router.post("/decision")
 async def read_root(request: Request):
     data = await request.json()
-    response = requests.post('http://[edge-server-ip]/decision', json=data)
+    response = requests.post('http://172.20.10.5:8002/decision', json=data)
     return response.json()
 
 #identification capacities endpoint
 @router.post("/identification")
 async def read_root(request: Request):
     data = await request.json()
-    response = requests.post("http://[cloud-server-ip]/identification", json=data)
+    response = requests.post("http://cloud:8001/identification", json=data)
     return response.json()  
 
 #trajectory planning capacitie endpoint
 @router.post('/trajectory_planning')
 async def read_root(request: Request):
     data = await request.json() 
-    response = requests.post('http://[cloud-server-ip]/trajectory_planning', json=data) 
+    response = requests.post('http://cloud:8001/trajectory_planning', json=data) 
     if response.status_code == 200:
         with open('map.html', 'wb') as f:
             f.write(response.content)

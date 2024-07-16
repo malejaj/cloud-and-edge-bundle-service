@@ -60,4 +60,10 @@ python main.py
   ```sh
   cd picar-x-code
   ```
-3. Run ```sh python main.py```
+3. Install requirements
+   ```sh
+   pip install -r requirements.txt
+3. Run
+   ```sh
+   python main.py
+   ```

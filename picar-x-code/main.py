@@ -1,9 +1,14 @@
 from picarx import Picarx
+from fastapi import FastAPI
+import requests
 from time import sleep
 import time
 import threading
 import requests
 from identification import identification
+
+app = FastAPI()
+
 import webbrowser
 import json
 
@@ -107,7 +112,19 @@ def detection(api, endpoint):
         #i = i + 1
     #responses.append(response_data)
     #save_response_times_to_file()
-    
+
+@app.post("/apply-instruction")
+def apply_instruction(instruction: dict):
+    """
+    El bundle envía la instrucción final al carro.
+    """
+    vitesse = instruction.get("vitesse")
+    if vitesse == "stop":
+        px_power.stop()
+        return {"status": "Car stopped"}
+    else:
+        # aquí puedes manejar seguir o cambiar velocidad
+        return {"status": f"Instruction applied: {vitesse}"}  
     
 def trajectory_planning(api, endpoint):
     data = {

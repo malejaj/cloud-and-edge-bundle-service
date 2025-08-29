@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ODRL Policy Schema",
+  "description": "Schema to validate single or multiple ODRL policies.",
+  "type": ["object", "array"],
+  "items": {
+    "type": "object",
+    "properties": {
+      "@context": {
+        "type": ["string", "array"],
+        "description": "ODRL context URI"
+      },
+      "uid": { "type": "string", "format": "uri" },
+      "type": {
+        "type": "string",
+        "enum": ["Set", "Offer", "Agreement"]
+      },
+      "permission": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "assignee": { "type": "string", "format": "uri" },
+            "target": { "type": "string", "format": "uri" },
+            "action": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "object" },
+                { "type": "array" }
+              ]
+            },
+            "duty": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "assignee": { "type": "string", "format": "uri" },
+                  "target": { "type": "string", "format": "uri" },
+                  "action": {
+                    "oneOf": [
+                      { "type": "string" },
+                      { "type": "object" }
+                    ]
+                  },
+                  "constraint": { "type": "array" },
+                  "informingParty": { "type": "string", "format": "uri" },
+                  "informedParty": { "type": "string", "format": "uri" }
+                },
+                "required": ["action"]
+              }
+            },
+            "constraint": { "type": "array" },
+            "informingParty": { "type": "string", "format": "uri" },
+            "informedParty": { "type": "string", "format": "uri" }
+          },
+          "required": ["target", "action"]
+        }
+      }
+    },
+    "required": ["@context", "uid", "type", "permission"]
+  }
+}

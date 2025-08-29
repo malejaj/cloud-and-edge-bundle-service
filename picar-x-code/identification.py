@@ -28,7 +28,7 @@ def identification(responses_cloud, api, endpoint):
             "img": img_base64
         }
         t1 = time.time()
-        url = f'http://172.20.192.1:8000/{api}/{endpoint}'
+        url = f'http://localhost:8000/{api}/{endpoint}'
         response = requests.post(url=url, json=data)
         if response.status_code == 200 and response.json():
             response = response.json()

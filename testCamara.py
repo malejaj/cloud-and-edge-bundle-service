@@ -1,3 +1,49 @@
+
+import cv2
+import base64
+import requests
+
+def main():
+    # Inicializar la cámara
+    cap = cv2.VideoCapture(0)
+
+    if not cap.isOpened():
+        print("Error: Could not open video.")
+        return
+
+    # Tomar un solo frame
+    ret, frame = cap.read()
+    cap.release()  # cerrar la cámara inmediatamente
+
+    if not ret:
+        print("Error: Failed to capture frame.")
+        return
+
+    # Convertir imagen a base64
+    _, buffer = cv2.imencode('.jpg', frame)
+    img_base64 = base64.b64encode(buffer).decode('utf-8')
+
+    # Preparar data para enviar
+    data = {"img": img_base64}
+
+    try:
+        # Enviar request al bundle
+        response = requests.post("http://localhost:8000/bundle/identification", json=data)
+        print(f"Status: {response.status_code}")
+        if response.status_code == 200:
+            print("Response JSON:", response.json())
+        else:
+            print("Error in response:", response.text)
+    except Exception as e:
+        print("Request failed:", e)
+
+
+if __name__ == "__main__":
+    main()
+
+
+'''
+
 import cv2
 import base64
 import requests
@@ -12,7 +58,7 @@ def main():
         return
 
     print("Press 'q' to quit.")
-    while True:
+    for _ in range(2):#while true
         ret, frame = cap.read()
         if not ret:
             print("Error: Failed to capture frame.")
@@ -43,3 +89,4 @@ def main():
     cv2.destroyAllWindows()
 
 main()
+'''

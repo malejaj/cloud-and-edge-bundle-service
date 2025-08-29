@@ -1,0 +1,39 @@
+[{
+  "@context": "http://www.w3.org/ns/odrl.jsonld",
+  "uid": "http://example.com/policy/enable-cap2-cap4-1",
+  "type": "Set",
+  "permission": [{
+    "assignee": "http://example.com/edge/cap2",
+    "target": "http://example.com/cap2/data",
+    "action": "inform",
+    "duty": [{
+      "assignee": "http://example.com/cloud/cap4",
+      "action": "NextPolicy",
+      "uid": "http://example.com/policy/enable-cap2-cap4-2",
+      "constraint": [{
+        "leftOperand": "event",
+        "operator": "eq",
+        "rightOperand": "https://www.wikidata.org/wiki/Q131437603",
+        "comment": "Object detected by cap2"
+      }]
+    }],
+    "informingParty": "http://example.com/edge/cap2",
+    "informedParty": "http://example.com/cloud/cap4"
+  }]
+},
+
+{
+  "@context": "http://www.w3.org/ns/odrl.jsonld",
+  "uid": "http://example.com/policy/enable-cap2-cap4-2",
+  "type": "Set",
+  "permission": [{
+      "assignee": "http://example.com/cloud/cap4",
+      "target": "http://example.com/data/cap4-output",
+      "action": "capture" ,
+      "constraint": [{
+          "leftOperand": "purpose",
+          "operator": "eq",
+          "rightOperand": "identification"
+        }]
+    }]
+}]

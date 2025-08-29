@@ -33,7 +33,5 @@ class Storage:
 
         self.used_gb = used_gb
 
-    def __repr__(self):
-        return f"<Storage {self.id}: {self.used_gb}/{self.capacity_gb} GB>"
 
 

@@ -11,7 +11,7 @@ app = FastAPI()
 @app.post("/identification")
 async def read_root(request: Request):
     data = await request.json()
-    response = identification(data)
+    response ="hola" # identification(data)
     return response
 
 #trajectory planning capacitie

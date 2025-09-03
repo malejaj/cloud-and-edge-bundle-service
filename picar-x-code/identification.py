@@ -10,6 +10,9 @@ cap.set(3,640)
 cap.set(4,480)
 responses = []
 
+bundleIP="140.93.97.159"
+port = 8000
+
 def save_response_times_to_file(filename='cloud_edge2_response_latency.json'):
     with open(filename, 'w') as f:
         json.dump(responses, f)
@@ -28,7 +31,7 @@ def identification(responses_cloud, api, endpoint):
             "img": img_base64
         }
         t1 = time.time()
-        url = f'http://localhost:8000/{api}/{endpoint}'
+        url =f'http://{bundleIP}:{8000}/{api}/{endpoint}'
         response = requests.post(url=url, json=data)
         if response.status_code == 200 and response.json():
             response = response.json()

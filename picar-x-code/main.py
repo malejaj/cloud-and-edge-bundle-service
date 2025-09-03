@@ -5,7 +5,8 @@ from time import sleep
 import time
 import threading
 import requests
-from identification import identification
+import uvicorn
+#from identification import identification
 
 app = FastAPI()
 
@@ -14,6 +15,7 @@ import json
 
 px = Picarx()
 
+
 current_state = None
 px_power = 10
 offset = 20
@@ -21,6 +23,10 @@ last_state = "stop"
 lock = threading.Lock()
 responses = []
 responses_cloud = []
+
+bundleIP="140.93.97.159"
+port = 8000
+
 
 #latency save
 def save_response_times_to_file(filename='cloud_edge_response_latency.json'):
@@ -90,7 +96,11 @@ def circulation():
         print("stop and exit")
         sleep(0.1)
 
-def detection(api, endpoint):
+
+
+
+
+def decision(api, endpoint):
     global px_power
     i = 0
     response_data = []
@@ -102,36 +112,25 @@ def detection(api, endpoint):
             "vitesse":px_power
             }
         t1 = time.time()
-        url = f'http://[bundle-server-ip]:8000/{api}/{endpoint}'
+        url = f'http://{bundleIP}:{8000}/{api}/{endpoint}'
         response = requests.post(url=url, json=data)
         t2 = time.time()
         response_data.append((t2 - t1) * 1000)
+        print(response.json())
         print('latency detection [edge] = ', (t2 - t1) * 1000)
         with lock:
-            px_power = response.json()["vitesse"]
+            px_power = response.json()
         #i = i + 1
-    #responses.append(response_data)
-    #save_response_times_to_file()
-
-@app.post("/apply-instruction")
-def apply_instruction(instruction: dict):
-    """
-    El bundle envía la instrucción final al carro.
-    """
-    vitesse = instruction.get("vitesse")
-    if vitesse == "stop":
-        px_power.stop()
-        return {"status": "Car stopped"}
-    else:
-        # aquí puedes manejar seguir o cambiar velocidad
-        return {"status": f"Instruction applied: {vitesse}"}  
+        responses.append(response_data)
+def stop():
+    px.stop()
     
 def trajectory_planning(api, endpoint):
     data = {
             "start_address":"Tripode A",
             "end_address":"7 avenue colonel roche"
         }
-    url = f'http://[bundle-server-ip]:8000/{api}/{endpoint}'
+    url = f'http://{bundleIP}:{8000}/{api}/{endpoint}'
     response = requests.post(url=url, json=data)
     if response.status_code == 200:
         with open("received_map.html", "wb") as f:
@@ -141,27 +140,53 @@ def trajectory_planning(api, endpoint):
     else:
         print(f"Failed to retrieve map: {response.status_code} - {response.text}")
     
+
+
+def identification(api,endpoint):
+    global px_power
+    i = 0
+    response_data = []
+    #while True:
+    while i < 100:
+        ultrasonic_percept = px.ultrasonic.read()
+        data = {
+            "distance":ultrasonic_percept
+        }
+        print("identification" , data)
+        t1 = time.time()
+        url =f'http://{bundleIP}:{8000}/{api}/{endpoint}'
+        response = requests.post(url=url, json=data)
+        print(response.json())
+        if response.status_code == 200 and response.json():
+            response = response.json()
+            #print(response.json())
+            #classId = response["classId"]
+            t2 = time.time()
+            print('delay identification [cloud] = ', (t2 - t1) * 1000)
+            response_data.append((t2 - t1) * 1000)
+        i = i + 1
+
 if __name__=='__main__':
-    
-    reponse = requests.get(url="http://[bundle-server-ip]:8000/get-bundle")
+
+    reponse = requests.get(url=f"http://{bundleIP}:{port}/get-bundle")
     data = reponse.json()
     t1 = time.time()
     trajectory_planning(data['api'], data['endpoint3'])
     t2 = time.time()
     print('delay trajectory [cloud] = ', (t2 - t1) * 1000)
     i = 0
-#while i < 10:       
-    thread1 = threading.Thread(target=circulation)
-    thread2 = threading.Thread(target=detection, args=(data['api'], data['endpoint1'],))
-    thread3 = threading.Thread(target=identification, args=(responses_cloud, data['api'], data['endpoint2'], ))
+    while i < 2:       
+        thread1 = threading.Thread(target=circulation)
+        thread2 = threading.Thread(target=decision, args=(data['api'], data['endpoint1'],))
+        thread3 = threading.Thread(target=identification, args=(data['api'], data['endpoint4'], ))
 
-    thread1.start()
-    thread2.start()
-    thread3.start()
-    
-    thread1.join()
-    thread2.join()
-    thread3.join()
-    #i += 1
+        thread1.start()
+        thread2.start()
+        thread3.start()
+        #uvicorn.run("main:app",host="0.0.0.0",port = 4000,reload=True)
+        thread1.join()
+        thread2.join()
+        thread3.join()
+        i += 1
 #save_response_times_to_file()
 #save_response_times2_to_file()

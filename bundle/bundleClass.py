@@ -1,14 +1,14 @@
 import time
 
-class Bundle:
+class bundleClass:
     def __init__(self, name: str):
         self.name = name
-        self.active_requests = []  # aquí se guardan las peticiones activas
+        self.active_requests = []  # list to store active requests
 
     def add_request(self, request: dict):
         """
-        Guarda una nueva petición con timestamp.
-        :param request: dict con los datos de la petición
+        Save a new request with timestamp.
+        :param request: dict with the request data
         """
         req_info = {
             "timestamp": time.time(),
@@ -18,17 +18,17 @@ class Bundle:
 
     def remove_request(self, request: dict):
         """
-        Elimina una petición si ya terminó.
-        :param request: dict que se quiere eliminar
+        Remove a request when it has finished.
+        :param request: dict that should be removed
         """
         self.active_requests = [
             r for r in self.active_requests if r["request"] != request
         ]
 
     def list_requests(self):
-        """Devuelve todas las peticiones en curso."""
+        """Return all current active requests."""
         return self.active_requests
 
     def clear_requests(self):
-        """Vacía todas las peticiones activas (por ejemplo al reiniciar el bundle)."""
+        """Clear all active requests (for example when restarting the bundle)."""
         self.active_requests.clear()

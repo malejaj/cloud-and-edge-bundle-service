@@ -31,6 +31,9 @@ class Party:
 @register_class
 class Action:
     def __init__(self, data: Union[str, dict]):
+        self._callback = None  # internal callback
+        self.real_value = None  # name
+
         if isinstance(data, str):
             self.id = data
             self.refinement = []
@@ -39,17 +42,29 @@ class Action:
             self.refinement = data.get("refinement", [])
         else:
             raise ValueError(f"Invalid action data: {data}")
+
+    @property
+    def callback(self):
+        return self._callback
+
+    @callback.setter
+    def callback(self, func):
+        self._callback = func
+        if func:
+            self.real_value = func.__name__  # guarda el nombre de la función
+        else:
+            self.real_value = None
+
     def execute(self, *args, **kwargs):
-        if self.callback:
-            print(f"[ACTION] executing {self.id}")
-            return self.callback(*args, **kwargs)
+        if self._callback:
+            print(f"[ACTION] executing {self.id} with callback {self.real_value}")
+            return self._callback(*args, **kwargs)
         else:
             print(f"[ACTION] No callback defined for {self.id}")
             return None
 
     def __repr__(self):
-        return f"Action(id='{self.id}', refinement={self.refinement})"
-
+        return f"Action(id='{self.id}', refinement={self.refinement}, real_value='{self.real_value}')"
 
 # ------------------------------
 # Rules
@@ -150,7 +165,7 @@ class Duty(Rule):
 @register_class
 class Rule:
     """
-    Regla genérica que puede ser Permission, Duty, Obligation, etc.
+    Generic rule Permission, Duty, Obligation, etc.
     """
     def __init__(self, type, assignee=None, target=None, action=None, duty=None, constraint=None,
                  informedParty=None, informingParty=None):

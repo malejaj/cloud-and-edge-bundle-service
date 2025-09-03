@@ -20,7 +20,8 @@ def get_bundle():
         "endpoint1":"decision", 
         "endpoint2":"identification", 
         "endpoint3":"trajectory_planning",
-        "endpoint4":"save",    
+        "endpoint4":"detection",
+        "endpoint5":"save",    
     }
     return bundle
 

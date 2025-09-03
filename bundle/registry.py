@@ -25,20 +25,17 @@ def build_object(obj_data):
             if k == "type":
                 continue
 
-            # Recursión
+            # Recursion
             if isinstance(v, dict):
                 kwargs[k] = build_object(v)
             elif isinstance(v, list):
                 kwargs[k] = [build_object(i) if isinstance(i, dict) else i for i in v]
             else:
                 kwargs[k] = v
-
-        # 🚀 Normalización especial para listas
-        # Si la clase espera 'constraints' o 'duties', asegúrate de que sean listas de objetos
         if "constraints" in kwargs and kwargs["constraints"] is None:
             kwargs["constraints"] = []
        
         return cls(**kwargs)
 
-    # Si no tiene "type", construimos recursivamente sub-elementos
+    # If there's no "type", we recursively build sub-elements
     return {k: build_object(v) for k, v in obj_data.items()}

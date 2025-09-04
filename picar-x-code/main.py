@@ -27,15 +27,15 @@ responses_cloud = []
 
 bundleIP="140.93.97.159"
 port = 8000
-iter =40
+iter =100
 
 #latency save
-def save_response_times_to_file(filename='cloud_edge_response_latency.json'):
+def save_response_times_to_file(filename='Edge.json'):
     with open(filename, 'w') as f:
         json.dump(responses, f)
     print(f'Temps de réponse sauvegardés dans {filename}')
     
-def save_response_times2_to_file(filename='cloud_edge2_response_latency.json'):
+def save_response_times2_to_file(filename='Cloud.json'):
     with open(filename, 'w') as f:
         json.dump(responses_cloud, f)
     print(f'Temps de réponse sauvegardés dans {filename}')
@@ -165,6 +165,7 @@ def identification(api,endpoint):
         #classId = response["classId"]
         t2 = time.time()
         print('delay identification [cloud] = ', (t2 - t1) * 1000)
+        
         response_data.append((t2 - t1) * 1000)
         #i = i + 1
     responses_cloud.append(response_data)
@@ -188,10 +189,10 @@ if __name__=='__main__':
     print('delay trajectory [cloud] = ', (t2 - t1) * 1000)
  
     
-    for i in range(10):
+    for i in range(iter):
         #thread1 = threading.Thread(target=circulation)
-        thread2 = threading.Thread(target=decision, args=(data['api'], data['endpoint1'],))
-        thread3 = threading.Thread(target=identification, args=(data['api'], data['endpoint4'],))
+        thread2 = threading.Thread(target=decision, args=(data['api'], data['endpoint5'],))
+        thread3 = threading.Thread(target=identification, args=(data['api'], data['endpoint6'],))
 
         #thread1.start()
         thread2.start()

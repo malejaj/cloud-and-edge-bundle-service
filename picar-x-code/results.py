@@ -30,9 +30,9 @@ def calcule_moyenne(listes):
     c = len(listes[0])
     print(f"Nombre de listes: {l}, Nombre d'éléments par liste: {c}")
     results = []
-    for j in range(l-1):
+    for i in range(l-1):
         value = 0
-        for i in range(c-1):
+        for j in range(c-1):
            
             value += float(listes[i][j])
         value = value / c
@@ -40,21 +40,22 @@ def calcule_moyenne(listes):
     return results
 
 
-list1= load_json('cloud-and-edge-bundle-service/picar-x-code/Edge.json')
-list2= load_json('cloud-and-edge-bundle-service/picar-x-code/Cloud.json')
-#list3= load_json('cloud-and-edge-bundle-service/picar-x-code/Edge-P.json')
-#list4= load_json('cloud-and-edge-bundle-service/picar-x-code/Cloud-P.json')
+list1= load_json('picar-x-code/Edge.json')
+list2= load_json('picar-x-code/Cloud.json')
+list3= load_json('picar-x-code/Edge-P.json')
+list4= load_json('picar-x-code/Cloud-P.json')
 
 try:
     edge=calcule_moyenne(list1)
     cloud=calcule_moyenne(list2)
-    #edgeP=calcule_moyenne(list3)
-    #cloudP=calcule_moyenne(list4)
+    edgeP=calcule_moyenne(list3)
+    cloudP=calcule_moyenne(list4)
 except ValueError as e:
     print(f"Erreur : {e}")
 
 
 
-plot_list(edge, cloud)
+plot_list(edge, edgeP)
+plot_list(cloud, cloudP)
 
 print(f"La nouvelle liste est sauvegardée dans result_file.json")

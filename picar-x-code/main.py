@@ -6,7 +6,7 @@ import time
 import threading
 import requests
 import uvicorn
-#from identification import identification
+
 
 app = FastAPI()
 
@@ -22,19 +22,20 @@ px_power = 10
 offset = 20
 last_state = "stop"
 lock = threading.Lock()
-responses = []
+responses_edge = []
 responses_cloud = []
 
 bundleIP="140.93.97.159"
 port = 8000
-iter =100
+iter =50
+iter1=5
 
 #latency save
 def save_response_times_to_file(filename='Edge.json'):
     with open(filename, 'w') as f:
-        json.dump(responses, f)
+        json.dump(responses_edge, f)
     print(f'Temps de réponse sauvegardés dans {filename}')
-    
+
 def save_response_times2_to_file(filename='Cloud.json'):
     with open(filename, 'w') as f:
         json.dump(responses_cloud, f)
@@ -105,25 +106,26 @@ def decision(api, endpoint):
     global px_power
     i = 0
     response_data = []
-    #for i in range(iter):
-    #while i < 100:
-    ultrasonic_percept = px.ultrasonic.read()
-    data = {
-        "front":ultrasonic_percept,
-        "vitesse":px_power
-        }
-    t1 = time.time()
-    url = f'http://{bundleIP}:{8000}/{api}/{endpoint}'
-    response = requests.post(url=url, json=data)
-    t2 = time.time()
-    response_data.append((t2 - t1) * 1000)
-    #print(response.json())
-    print('latency detection [edge] = ', (t2 - t1) * 1000)
-    with lock:
-        px_power = response.json()
-        print("vitesse", px_power)
-    #i = i + 1
-    responses.append(response_data)
+    while i < iter1:
+        ultrasonic_percept = px.ultrasonic.read()
+        data = {
+            "front":ultrasonic_percept,
+            "vitesse":px_power
+            }
+        t1 = time.time()
+        url = f'http://{bundleIP}:{8000}/{api}/{endpoint}'
+        response = requests.post(url=url, json=data, timeout=5)
+        t2 = time.time()
+        response_data.append(f"{(t2 - t1) * 1000:.3f}")
+        #print(response.json())
+        #print('latency detection [edge] = ', f"{(t2 - t1) * 1000:.3f}")
+        with lock:
+            px_power = response.json()
+            #print("vitesse", px_power)
+        i = i + 1
+        
+    responses_edge.append(response_data)
+
 def stop():
     px.stop()
     
@@ -149,25 +151,25 @@ def identification(api,endpoint):
     i = 0
     response_data = []
     #while True:
-    #while i < 100:
-    ultrasonic_percept = px.ultrasonic.read()
-    data = {
-        "distance":ultrasonic_percept
-    }
-    #print("identification" , data)
-    t1 = time.time()
-    url =f'http://{bundleIP}:{8000}/{api}/{endpoint}'
-    response = requests.post(url=url, json=data)
-    #print(response.json())
-    if response.status_code == 200 and response.json():
-        response = response.json()
+    while i < iter1:
+        ultrasonic_percept = px.ultrasonic.read()
+        data = {
+            "distance":ultrasonic_percept
+        }
+        #print("identification" , data)
+        t1 = time.time()
+        url =f'http://{bundleIP}:{8000}/{api}/{endpoint}'
+        response = requests.post(url=url, json=data, timeout=5)
         #print(response.json())
-        #classId = response["classId"]
-        t2 = time.time()
-        print('delay identification [cloud] = ', (t2 - t1) * 1000)
-        
-        response_data.append((t2 - t1) * 1000)
-        #i = i + 1
+        if response.status_code == 200 and response.json():
+            response = response.json()
+            #print(response.json())
+            #classId = response["classId"]
+            t2 = time.time()
+            #print('delay identification [cloud] = ', f"{(t2 - t1) * 1000:.3f}")
+
+        response_data.append(f"{(t2 - t1) * 1000:.3f}")
+        i = i + 1
     responses_cloud.append(response_data)
 
 def get_px():
@@ -183,16 +185,16 @@ if __name__=='__main__':
     px = get_px()
     reponse = requests.get(url=f"http://{bundleIP}:{port}/get-bundle")
     data = reponse.json()
-    t1 = time.time()
-    trajectory_planning(data['api'], data['endpoint3'])
-    t2 = time.time()
-    print('delay trajectory [cloud] = ', (t2 - t1) * 1000)
+    #t1 = time.time()
+    #trajectory_planning(data['api'], data['endpoint3'])
+    #t2 = time.time()
+    #print('delay trajectory [cloud] = ', (t2 - t1) * 1000)
  
     
     for i in range(iter):
         #thread1 = threading.Thread(target=circulation)
-        thread2 = threading.Thread(target=decision, args=(data['api'], data['endpoint5'],))
-        thread3 = threading.Thread(target=identification, args=(data['api'], data['endpoint6'],))
+        thread2 = threading.Thread(target=decision, args=(data['api'], data['endpoint1'],))
+        thread3 = threading.Thread(target=identification, args=(data['api'], data['endpoint4'],))
 
         #thread1.start()
         thread2.start()
@@ -201,6 +203,7 @@ if __name__=='__main__':
         #thread1.join()
         thread2.join()
         thread3.join()
+        print("iteration ", i)
 
     save_response_times_to_file()
     save_response_times2_to_file()

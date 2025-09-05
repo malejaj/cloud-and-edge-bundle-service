@@ -1,0 +1,10 @@
+.vscode/*
+*.code-workspace
+venv/
+env/
+.build/
+__pycache__/
+*.egg-info/
+*.env
+
+build/*

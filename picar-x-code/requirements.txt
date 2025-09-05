@@ -1,3 +1,7 @@
 numpy
 requests
 opencv-python
+fastapi
+uvicorn
+requests
+git+https://github.com/sunfounder/picar-x.git

@@ -27,8 +27,8 @@ responses_cloud = []
 
 bundleIP="140.93.97.159"
 port = 8000
-iter =50
-iter1=5
+iter =100
+iter1=7
 
 #latency save
 def save_response_times_to_file(filename='Edge.json'):
@@ -159,7 +159,7 @@ def identification(api,endpoint):
         #print("identification" , data)
         t1 = time.time()
         url =f'http://{bundleIP}:{8000}/{api}/{endpoint}'
-        response = requests.post(url=url, json=data, timeout=5)
+        response = requests.post(url=url, json=data, timeout=7)
         #print(response.json())
         if response.status_code == 200 and response.json():
             response = response.json()
@@ -193,8 +193,8 @@ if __name__=='__main__':
     
     for i in range(iter):
         #thread1 = threading.Thread(target=circulation)
-        thread2 = threading.Thread(target=decision, args=(data['api'], data['endpoint1'],))
-        thread3 = threading.Thread(target=identification, args=(data['api'], data['endpoint4'],))
+        thread2 = threading.Thread(target=decision, args=(data['api'], data['endpoint5'],))
+        thread3 = threading.Thread(target=identification, args=(data['api'], data['endpoint6'],))
 
         #thread1.start()
         thread2.start()

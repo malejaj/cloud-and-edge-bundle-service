@@ -17,10 +17,13 @@ app.include_router(bundle_router, prefix="/bundle")
 def get_bundle():
     bundle = {
         "api":"bundle",
-        "endpoint1":"decision", 
-        "endpoint2":"identification", 
-        "endpoint3":"trajectory_planning",
-        "endpoint4":"save",    
+        "endpoint1": "decision",
+        "endpoint2": "identification",
+        "endpoint3": "trajectory_planning",
+        "endpoint4": "detection",
+        "endpoint5": "decision-raw",
+        "endpoint6": "detection-raw",
+        "endpoint7": "save",
     }
     return bundle
 

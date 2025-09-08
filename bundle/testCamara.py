@@ -2,32 +2,50 @@
 import cv2
 import base64
 import requests
+def capture_image():
+    print("Capturing image...")
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("Error: Could not open video.")
+        return None
+
+    ret, frame = cap.read()
+    cap.release()
+    if not ret:
+        print("Error: Failed to capture frame.")
+        return None
+
+    _, buffer = cv2.imencode('.jpg', frame)
+    img_base64 = base64.b64encode(buffer).decode('utf-8')
+    data = {"img": img_base64}
+    return data
+
 
 def main():
-    # Inicializar la cámara
+    # Initialize the camera
     cap = cv2.VideoCapture(0)
 
     if not cap.isOpened():
         print("Error: Could not open video.")
         return
 
-    # Tomar un solo frame
+    # Capture a single frame
     ret, frame = cap.read()
-    cap.release()  # cerrar la cámara inmediatamente
+    cap.release()  # close the camera immediately
 
     if not ret:
         print("Error: Failed to capture frame.")
         return
 
-    # Convertir imagen a base64
+    # Convert image to base64
     _, buffer = cv2.imencode('.jpg', frame)
     img_base64 = base64.b64encode(buffer).decode('utf-8')
 
-    # Preparar data para enviar
+    # Prepare data to send
     data = {"img": img_base64}
 
     try:
-        # Enviar request al bundle
+        # Send request to the bundle
         response = requests.post("http://localhost:8000/bundle/identification", json=data)
         print(f"Status: {response.status_code}")
         if response.status_code == 200:

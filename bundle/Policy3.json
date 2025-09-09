@@ -1,0 +1,26 @@
+[{
+  "@context": "http://www.w3.org/ns/odrl.jsonld",
+  "uid": "http://example.com/policy/constrain-cap6-cap2",
+  "type": "Set",
+  "prohibition": [{
+      "assignee": "http://example.com/edge/cap2",
+      "target": "http://example.com/cap2/data-to-save",
+      "action": "store",
+      "constraint": [{
+          "leftOperand": "percentage",
+          "operator": "gt",
+          "rightOperand": 80,
+          "unit": "odrl:percentage",
+          "comment": "Prohibit storing cap2 output if cloud storage exceeds 80% capacity"
+        }],
+      "remedy": [{
+          "action": "delay",
+          "refinement": [{
+              "leftOperand": "elapsedTime",
+              "operator": "eq",
+              "rightOperand": "PT2M",
+              "comment": "Wait 2 minutes before retrying the storage operation"
+            }]
+        }]
+    }]
+}]

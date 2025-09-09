@@ -2,6 +2,10 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 
+import os
+
+os.makedirs("images", exist_ok=True)
+
 def load_json(filename):
     with open(filename, 'r') as f:
         return json.load(f)
@@ -15,36 +19,40 @@ def add_lists(list1, list2):
         raise ValueError("Les listes doivent avoir la même longueur")
     return [x + y for x, y in zip(list1, list2)]
 
-def plot_list(data1, data2,title,filename):
+def plot_list(data1, data2, title, filename):
     plt.figure(figsize=(10, 5))
-    plt.plot(data1, marker='o', color='green', label=" Avec Politique")
-    plt.plot(data2, marker='x', color='blue', label=" Sans Politique")
-    plt.title('Comparison of latencies'+title)
-    plt.xlabel('Number of requests')
-    plt.ylabel('Latency in ms')
-    plt.grid(True)
+
+    # Plot lines
+    plt.plot(data1, color='darkorange', label="without Policy")
+    plt.plot(data2, color='purple', label="with Policy")
+
+    # Mean lines
+    mean1 = np.mean(data1)
+    mean2 = np.mean(data2)
+    plt.axhline(mean1, color='darkorange', linestyle='--', alpha=0.7, label=f"mean w/o Policy ({mean1:.1f} ms)")
+    plt.axhline(mean2, color='purple', linestyle='--', alpha=0.7, label=f"mean w/ Policy ({mean2:.1f} ms)")
+
+   
+    plt.title('Comparison of latencies ' + title)
+    plt.xlabel('Experiment iteration')
+    plt.ylabel('Latency (ms)')
+    plt.grid(True, linestyle=":", alpha=0.7)
     plt.legend()
-    plt.savefig(filename)
+    plt.tight_layout()
 
-
-def plot_means_with_errorbars(datasets, labels, title, filename):
-    means = [np.mean(d) for d in datasets]
-    stds = [np.std(d) for d in datasets]
-
-    plt.figure(figsize=(8, 6))
-    plt.bar(labels, means, yerr=stds, capsize=5, color=['green', 'blue'])
-    plt.title("Average Latency " + title)
-    plt.ylabel("Latency (ms)")
-    plt.savefig(filename)
+    filepath = os.path.join("images", filename + ".png")
+    plt.savefig(filepath)
     plt.close()
+
 
 def plot_boxplot(data1, data2, title, filename):
     plt.figure(figsize=(8, 6))
-    plt.boxplot([data1, data2], labels=["Avec Politique", "Sans Politique"])
+    plt.boxplot([data1, data2], labels=["without Policy", "with Policy"])
     plt.title("Distribution of Latencies " + title)
     plt.ylabel("Latency (ms)")
     plt.grid(True, axis='y')
-    plt.savefig(filename)
+    file_path = os.path.join("images", filename + ".png")
+    plt.savefig(file_path)
     plt.close()
 
 
@@ -63,10 +71,10 @@ def calcule_moyenne(listes):
     return results
 
 
-list1= load_json('cloud-and-edge-bundle-service/picar-x-code/Edge.json')
-list2= load_json('cloud-and-edge-bundle-service/picar-x-code/Cloud.json')
-list3= load_json('cloud-and-edge-bundle-service/picar-x-code/Edge-P.json')
-list4= load_json('cloud-and-edge-bundle-service/picar-x-code/Cloud-P.json')
+list1= load_json('picar-x-code/Edge.json')
+list2= load_json('picar-x-code/Cloud.json')
+list3= load_json('picar-x-code/Edge-P.json')
+list4= load_json('picar-x-code/Cloud-P.json')
 
 try:
     edge=calcule_moyenne(list1)
@@ -89,10 +97,10 @@ print("Edge con politica ",media(edgeP))
 print("Cloud sin politica",media(cloud))
 print("Cloud con politica",media(cloudP))
 
-plot_means_with_errorbars(edgeP, "labels","title", "filename")
+
 
 plot_list(edge, edgeP, "Edge ","Plotlist Edge")
 plot_list(cloud, cloudP,"Cloud","Plotlist Cloud")
 
-#plot_boxplot(edge,edgeP," Edge ","boxplot Edge")
-#plot_boxplot(cloud,cloudP,"Cloud", "boxplot Cloud")
+plot_boxplot(edge,edgeP," Edge ","boxplot Edge")
+plot_boxplot(cloud,cloudP,"Cloud", "boxplot Cloud")
